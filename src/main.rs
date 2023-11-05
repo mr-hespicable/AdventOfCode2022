@@ -1,10 +1,11 @@
-use std::{io, env, fs::{self, File, DirEntry}, collections::HashMap, path::Path, char, str::FromStr, fmt::format};
+use std::{fs::{self}, path::Path, char};
 
 fn main(){
     let mut fnlist: Vec<String> = Vec::new();
     fnlist.push(day_1());
     fnlist.push(day_2());
     fnlist.push(day_3());
+    fnlist.push(day_4());
 
     for i in 0..fnlist.len(){
         println!("Day {}:\n{}\n", i+1, fnlist[i]);
@@ -99,7 +100,7 @@ fn day_3() -> String {
     let path = Path::new("./inputs/input_day3.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
-    let mut p1: String;
+    let p1: String;
     let mut p2: i32 = 0;
 
     //part 1
@@ -136,7 +137,7 @@ fn day_3() -> String {
         let elf2 = lines[start_index+1];
         let elf3 = lines[start_index+2];
 
-        println!("elf1: {}\nelf2: {}\nelf3: {}", elf1, elf2, elf3);
+        //println!("elf1: {}\nelf2: {}\nelf3: {}", elf1, elf2, elf3);
 
         let mut inv_set: Vec<char> = Vec::new();
 
@@ -149,11 +150,9 @@ fn day_3() -> String {
             }
         }
 
-        print!("inv_set: ");
-        for t in &inv_set {
-            print!("{}", t);
-        }
-        println!("\n");
+        // for t in &inv_set {
+            // print!("{}", t);
+        // }
 
         for char in inv_set {
             match elf3.find(char) {
@@ -163,9 +162,9 @@ fn day_3() -> String {
                 #[allow(unused_variables)]
                 Some(rah) => {
                     let matched_char = char;
-                    println!("matched_char: {}", matched_char);
+                    //println!("matched_char: {}", matched_char);
                     let value = (VALUE_LIST.find(matched_char).unwrap() as i32) + 1;
-                    println!("value: {}\n", value);
+                    //println!("value: {}\n", value);
                     p2 += value;
                     break;
                 },
@@ -179,4 +178,25 @@ fn day_3() -> String {
     result
 }
 
-//whoa.
+fn day_4() -> String {
+    let path = Path::new("./inputs/input_day4.txt");
+    let input = fs::read_to_string(path).expect("file not found");
+
+    let mut count: i32 = 0;
+    for line in input.lines() {
+        //x-y,a-b
+        let pairs: Vec<&str> = line.split(",").collect(); //['x-y', 'a-b']
+        let sec_1: Vec<&str> = pairs[0].split("-").collect(); //'x','y'
+        let sec_2: Vec<&str> = pairs[1].split("-").collect(); //'a','b'
+
+        let condition: bool = (sec_1[0] <= sec_2[0] && sec_1[1] >= sec_2[1]) || (sec_1[0] >= sec_2[0] && sec_1[1] <= sec_2[1]);
+
+        if condition {
+            println!("{}\n{}\n", pairs[0], pairs[1]);
+            println!("{}", count);
+            count += 1;
+        }
+    }
+
+    count.to_string()
+}
