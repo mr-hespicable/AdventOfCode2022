@@ -1,2 +1,3 @@
 i know im a year too late
-learning rust :)
+
+learning rust through this :)
