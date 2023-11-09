@@ -1,4 +1,4 @@
-use std::{fs::{self}, path::Path, char};
+use std::{fs::{self}, path::Path, char, process::exit, ops::RangeInclusive};
 
 fn main(){
     let mut fnlist: Vec<String> = Vec::new();
@@ -13,7 +13,7 @@ fn main(){
 }
 
 fn day_1() -> String {
-    let path = Path::new("./inputs/input_day1.txt");
+    let path = Path::new("inputs/input_day1.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
     let mut inventory_vec: Vec<i32> = Vec::new();
@@ -39,7 +39,7 @@ fn day_1() -> String {
 }
 
 fn day_2() -> String {
-    let path = Path::new("./inputs/input_day2.txt");
+    let path = Path::new("inputs/input_day2.txt");
     let input = fs::read_to_string(path).expect("file not found");
     //A = Rock: 1
     //B = Paper: 2
@@ -97,7 +97,7 @@ fn day_2() -> String {
 
 fn day_3() -> String {
     const VALUE_LIST: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let path = Path::new("./inputs/input_day3.txt");
+    let path = Path::new("inputs/input_day3.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
     let p1: String;
@@ -179,24 +179,42 @@ fn day_3() -> String {
 }
 
 fn day_4() -> String {
-    let path = Path::new("./inputs/input_day4.txt");
+    let path = Path::new("inputs/input_day4.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
     let mut count: i32 = 0;
     for line in input.lines() {
+        if line == "exit" {
+            println!("count: {}", count);
+            exit(0);
+        }
         //x-y,a-b
-        let pairs: Vec<&str> = line.split(",").collect(); //['x-y', 'a-b']
-        let sec_1: Vec<&str> = pairs[0].split("-").collect(); //'x','y'
-        let sec_2: Vec<&str> = pairs[1].split("-").collect(); //'a','b'
+        let pairs: Vec<&str> = line.split(",").collect(); //'x-y', 'a-b'
+        let pair_1: Vec<i32> = pairs[0].split("-")
+            .map(|s| s.parse().expect("failed integer parsation"))
+            .collect();
+        let pair_2: Vec<i32> = pairs[1].split("-")
+            .map(|s| s.parse().expect("failed integer parsation"))
+            .collect();
 
-        let condition: bool = (sec_1[0] <= sec_2[0] && sec_1[1] >= sec_2[1]) || (sec_1[0] >= sec_2[0] && sec_1[1] <= sec_2[1]);
+        let range_1 = pair_1[0]..=pair_1[1];
+        let range_2 = pair_2[0]..=pair_2[1];
+
+        let cond1 = range_1.contains(range_2.start()) && range_1.contains(range_2.end());
+        let cond2 = range_2.contains(range_1.start()) && range_2.contains(range_1.end());
+
+        let condition = cond1 || cond2;
 
         if condition {
-            println!("{}\n{}\n", pairs[0], pairs[1]);
-            println!("{}", count);
+            println!("pairs: {:?}\ncond1: {}\ncond2: {}", pairs, cond1, cond2);
+            println!("range 1: {:?}\nrange 2: {:?}\n\n", range_1, range_2);
             count += 1;
         }
     }
 
     count.to_string()
 }
+
+// pairs: ["4-19", "19-67"]
+// cond1: false
+// cond2: true
