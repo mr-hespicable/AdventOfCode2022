@@ -1,4 +1,4 @@
-use std::{fs::{self}, path::Path, char, process::exit, ops::RangeInclusive};
+use std::{fs::{self}, path::Path, char, process::exit, ops::RangeInclusive, fmt::format};
 
 fn main(){
     let mut fnlist: Vec<String> = Vec::new();
@@ -182,10 +182,12 @@ fn day_4() -> String {
     let path = Path::new("inputs/input_day4.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
-    let mut count: i32 = 0;
+    let mut containment_count: i32 = 0;
+    let mut overlap_count: i32 = 0;
+
     for line in input.lines() {
         if line == "exit" {
-            println!("count: {}", count);
+            // println!("count: _}", containment_count);
             exit(0);
         }
         //x-y,a-b
@@ -200,19 +202,32 @@ fn day_4() -> String {
         let range_1 = pair_1[0]..=pair_1[1];
         let range_2 = pair_2[0]..=pair_2[1];
 
-        let cond1 = range_1.contains(range_2.start()) && range_1.contains(range_2.end());
-        let cond2 = range_2.contains(range_1.start()) && range_2.contains(range_1.end());
+        let front_containment = range_1.contains(range_2.start()) && range_1.contains(range_2.end());
+        let back_containment = range_2.contains(range_1.start()) && range_2.contains(range_1.end());
+        
+        let front_overlap = range_1.contains(range_2.start()) || range_1.contains(range_2.end());
+        let back_overlap = range_2.contains(range_1.start()) || range_2.contains(range_1.end());
 
-        let condition = cond1 || cond2;
 
-        if condition {
-            println!("pairs: {:?}\ncond1: {}\ncond2: {}", pairs, cond1, cond2);
-            println!("range 1: {:?}\nrange 2: {:?}\n\n", range_1, range_2);
-            count += 1;
+        let containment_condition = front_containment || back_containment;
+        let overlap_condition = front_overlap || back_overlap;
+
+        if containment_condition {
+            // println!("pairs: {:?}\na in b: {}\nb in a: {}", pairs, front_containment, back_containment);
+            // println!("range 1: {:?}\nrange 2: {:?}\n\n", range_1, range_2);
+            containment_count += 1;
+        }
+
+        if overlap_condition {
+            overlap_count += 1;
         }
     }
 
-    count.to_string()
+    let p1 = containment_count.to_string();
+    let p2 = overlap_count.to_string();
+
+    let result = format!("part 1: {}\npart 2: {}", p1, p2);
+    result
 }
 
 // pairs: ["4-19", "19-67"]
