@@ -1,5 +1,4 @@
-use std::{fs::{self}, path::Path, char, process::exit, time::Instant, thread, time};
-use clearscreen::clear;
+use std::{fs::{self}, path::Path, char, process::exit, time::Instant};
 
 fn main(){
     let mut fnlist: Vec<String> = Vec::new();
@@ -252,8 +251,8 @@ fn day_5() -> String {
     let mut table_finished: bool = false;
     let mut stack: Vec<Vec<String>> = Vec::new();
 
-    for raw_line in input.lines() {
-        if raw_line.is_empty() { //check if table is done
+    for line in input.lines() {
+        if line.is_empty() { //check if table is done
             table_finished = true; 
             stack.pop(); //delete empty line, which is due to number list on bottom
             println!("{:?}", stack);
@@ -262,7 +261,7 @@ fn day_5() -> String {
 
         if table_finished { //do stack things
             //move x from y to z
-            let line: Vec<&str> = raw_line.split(" ").collect();
+            let line: Vec<&str> = line.split(" ").collect();
             let amount: usize = line[1].parse().unwrap(); //amount of krates to move
             let k_i: usize = line[3].parse().unwrap(); //initial krate column
             let k_f: usize = line[5].parse().unwrap(); //final krate column
@@ -274,52 +273,35 @@ fn day_5() -> String {
             let mut initial_value: String;
             let mut final_value: String;
 
-            //stack coords go stack[col][row]
-            for i in 0..stack.len() { //find initial crate //rows
+            for i in 0..stack.len() { //find initial krate
                 initial_coords = (i, k_i-1); //tuple of row: usize, col: usize
                 println!("initial coords: {:?}", initial_coords);
                 initial_value = stack[initial_coords.0][initial_coords.1].clone(); //is correct(i think)
                 println!("initial value: {}", initial_value);
 
-                if !(initial_value == "   ") && initial_coords.0 != 0 { //FOUND VALUE
-                    for j in 1..stack.len() { //find where krate is gonna land // row
+                if !(initial_value == "   ") && initial_coords.0 != 0 {
+                    println!("coords: ({},{})", i, k_i-1);
+                    for j in 1..stack.len() { //find where krate is gonnna land
                         final_coords = (j, k_f-1); //row, col
                         final_value = stack[final_coords.0][final_coords.1].clone();
 
                         if !(final_value == "   ") { 
                             for k in 0..amount {
                                 //println!("j is {}", j);
-                                 
-                                //DEBUGGING HERE TO CHECK SOME STUFF 2
-                                clear();
-                                for row in stack.clone() {
-                                    println!("{:?}", row);
-                                }
-                                println!("amount: {}", amount);
-                                println!("instruction: {:?}", line);
-                                println!("initial coords: {:?}\nfinal coords: {:?}", initial_coords, final_coords, );
-                                thread::sleep(time::Duration::from_secs(10));
-                                clear();
-                                //DEBUGGING END
-                                
                                 stack[final_coords.0-1][final_coords.1] = initial_value.clone();
-                                stack[initial_coords.0][initial_coords.1] = "   ".to_string();
                             }
-                            break;
                         }
+
                     }
-                    break;
                 }
             }
 
-            //DEBUGGING HERE TO CHECK SOME STUFF
-
         } else { //build table
             let mut row: Vec<String> = Vec::new();
-            for index in (0..raw_line.chars().count()).step_by(4) {
-                let char = raw_line.chars().nth(index).unwrap();
+            for index in (0..line.chars().count()).step_by(4) {
+                let char = line.chars().nth(index).unwrap();
                 if char == '[' {
-                    row.push(format!("{}{}{}", raw_line.chars().nth(index).unwrap(), raw_line.chars().nth(index+1).unwrap(), raw_line.chars().nth(index+2).unwrap()));
+                    row.push(format!("{}{}{}", line.chars().nth(index).unwrap(), line.chars().nth(index+1).unwrap(), line.chars().nth(index+2).unwrap()));
                 } else {
                     row.push(empty.to_string());
                 }
