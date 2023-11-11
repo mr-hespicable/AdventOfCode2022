@@ -247,19 +247,18 @@ fn day_5() -> String {
     let path = Path::new("inputs/input_day5.txt");
     let input = fs::read_to_string(path).expect("file not found");
 
-    let empty = "   ";
-    let empty_vec: Vec<String> = vec![empty.to_string(); 9];
+    let empty = "   ".to_string();
+    let empty_vec: Vec<String> = vec![empty; 5];
 
     let mut table_finished: bool = false;
-    let mut stack: Vec<Vec<String>> = Vec::new(); //stack[row][column]
+    let mut stack: Vec<Vec<String>> = Vec::new();
 
     for raw_line in input.lines() {
+        stack.insert(0, empty_vec);
         if raw_line.is_empty() { //check if table is done
             table_finished = true; 
             stack.pop(); //delete empty line, which is due to number list on bottom
-            for row in &stack {
-                println!("{:?}", row);
-            }
+            println!("{:?}", stack);
             continue
         }
 
@@ -267,71 +266,35 @@ fn day_5() -> String {
             //move x from y to z
             let line: Vec<&str> = raw_line.split(" ").collect();
             let amount: usize = line[1].parse().unwrap(); //amount of krates to move
-            let initial_column: usize = line[3].parse().unwrap(); //initial krate column
-            let final_column: usize = line[5].parse().unwrap(); //final krate column
-            println!("initial_column: {}\nfinal_column: {}", initial_column, final_column);
+            let k_i: usize = line[3].parse().unwrap(); //initial krate column
+            let k_f: usize = line[5].parse().unwrap(); //final krate column
+            println!("k_i: {}\nk_f: {}", k_i, k_f);
 
-            let mut initial_coords: (usize, usize) = (0, 0); //row, col
-            let mut initial_value: String = "".to_string(); //3 chars
+            let mut initial_coords: (usize, usize);
+            let mut initial_value: String;
 
-            let mut write_coords: (usize, usize) = (0, 0); //row, col
-            //let mut write_value: &String; //3 chars
+            let mut final_coords: (usize, usize);
+            let mut final_value: String;
 
-            //remove empty rows
-            stack.retain(|row| {
-                !row.iter().all(|krate| krate == "   ")
-            });
+            for row in 0..stack.len() {
+                if stack[row].is_empty() {
 
-
-
-            //amount of times swapper is run
-            for time in 0..amount {
-                //insert empty row at the top of the stack
-                //this adds lots of padding (is removed after loop)
-                stack.insert(0, empty_vec.clone());
-
-                //swapper
-                
-                //find initial value
-                for row in 1..stack.len() {
-                    if &stack[stack.len()-row][initial_column-1] != "   " && row-1 != 0 {
-                        initial_coords = (stack.len()-(row-1), initial_column-1);
-                        initial_value = stack[initial_coords.0][initial_coords.1].clone();
-                    }
                 }
-
-                //find final coords
-                for row in 1..stack.len() {
-                    if &stack[stack.len()-row][initial_column-1] != "   " {
-                        write_coords = (stack.len()-row, final_column-1);
-                        //write_value = &stack[write_coords.0][write_coords.1]; //should always be "   "
-                    }
-                }
-
-                //move initial value to final coords
-                stack[write_coords.0][write_coords.1] = initial_value.clone();
-
-                //erase initial value
-                stack[initial_coords.0][initial_coords.1] = empty.to_string();
-
             }
 
-            //OLD IMPLEMENTATION
-
-            /*
             //stack coords go stack[col][row]
             for i in 1..stack.len() { //in each row: find 
-                initial_coords = (i, initial_column-1); //tuple of row: usize, col: usize
+                initial_coords = (i, k_i-1); //tuple of row: usize, col: usize
                 initial_value = stack[initial_coords.0][initial_coords.1].clone(); //is correct(i think)
 
                 if !(initial_value == "   ") && initial_coords.0 != 0 { //
                     for j in 1..stack.len() { //find where krate is gonna land // row
-                        write_coords = (j, final_column-1); //row, col
-                        write_value = stack[write_coords.0][write_coords.1].clone();
+                        final_coords = (j, k_f-1); //row, col
+                        final_value = stack[final_coords.0][final_coords.1].clone();
 
-                        if !(write_value == "   ") { 
+                        if !(final_value == "   ") { 
                             for k in 0..amount {
-                                initial_coords = (i+k, initial_column-1); //tuple of row: usize, col: usize
+                                initial_coords = (i+k, k_i-1); //tuple of row: usize, col: usize
                                 initial_value = stack[initial_coords.0][initial_coords.1].clone(); //is correct(i think)
                                 //println!("j is {}", j);
                                  
@@ -342,15 +305,12 @@ fn day_5() -> String {
                                 }
                                 println!("amount: {}", amount);
                                 println!("instruction: {:?}", line);
-                                println!("initial value: {:?} at {:?}\nfinal value: {:?} at {:?}", initial_value, initial_coords, write_value, write_coords, );
+                                println!("initial value: {:?} at {:?}\nfinal value: {:?} at {:?}", initial_value, initial_coords, final_value, final_coords, );
                                 println!("offset: {}", k);
                                 thread::sleep(time::Duration::from_secs(5));
                                 //DEBUGGING END
                                 
-                                //write initial value to final coordinates
-                                stack[write_coords.0-1][write_coords.1] = initial_value.clone();
-
-                                //remove the initial value
+                                stack[final_coords.0-1][final_coords.1] = initial_value.clone();
                                 stack[initial_coords.0][initial_coords.1] = "   ".to_string();
                             }
                             break;
@@ -359,7 +319,6 @@ fn day_5() -> String {
                     break;
                 }
             }
-            */
 
         } else { //build table
             let mut row: Vec<String> = Vec::new();
@@ -374,20 +333,8 @@ fn day_5() -> String {
             stack.push(row);
         }
     }
-
-    //format result
-
-    let mut result = String::new();
-    for row in stack.iter() {
-        for col in row.iter() {
-            result.push_str(col);
-            result.push_str("|");
-        }
-        result.push_str("\n");
-    }
-
-    result
-
+    let result = format!("{:?}", stack);
+    result.to_string()
 }
 
 // pairs: ["4-19", "19-67"]
