@@ -294,25 +294,38 @@ fn day_5() -> String {
                 
                 //find initial value
                 for row in 1..stack.len() {
-                    if &stack[stack.len()-row][initial_column-1] != "   " && row-1 != 0 {
-                        initial_coords = (stack.len()-(row-1), initial_column-1);
+                    if &stack[stack.len()-row][initial_column-1] != "   " /*&& row-1 != 0*/ {
+                        initial_coords = (stack.len()-row, initial_column-1);
                         initial_value = stack[initial_coords.0][initial_coords.1].clone();
                     }
                 }
 
                 //find final coords
                 for row in 1..stack.len() {
-                    if &stack[stack.len()-row][initial_column-1] != "   " {
-                        write_coords = (stack.len()-row, final_column-1);
+                    if &stack[stack.len()-row][final_column-1] != "   " {
+                        write_coords = (stack.len() - (row+1), final_column-1);
                         //write_value = &stack[write_coords.0][write_coords.1]; //should always be "   "
                     }
                 }
 
+                //DEBUGGING HERE TO CHECK SOME STUFF 2
+                let _ = clear();
+                for row in stack.clone() {
+                    println!("{:?}", row);
+                }
+                println!("amount: {}", amount);
+                println!("instruction: {:?}", line);
+                println!("initial value: {:?} at {:?}\nfinal coords: {:?}", initial_value, initial_coords, write_coords, );
+                println!("offset: {}", time);
+                thread::sleep(time::Duration::from_millis(5000));
+                //DEBUGGING END
+                
                 //move initial value to final coords
                 stack[write_coords.0][write_coords.1] = initial_value.clone();
 
                 //erase initial value
                 stack[initial_coords.0][initial_coords.1] = empty.to_string();
+
 
             }
 
