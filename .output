@@ -1,0 +1,5 @@
+amount: 6
+instruction: ["move", "6", "from", "8", "to", "5"]
+initial value: "" at (0, 0)
+final coords: (0, 0)
+offset: 5

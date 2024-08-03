@@ -1,4 +1,4 @@
-use std::{fs::{self}, path::Path, char, process::exit, time::Instant, thread, time};
+use std::{fs::{self, File}, path::Path, char, process::exit, time::Instant, thread, time};
 use clearscreen::clear;
 
 fn main(){
@@ -253,7 +253,9 @@ fn day_5() -> String {
     let mut table_finished: bool = false;
     let mut stack: Vec<Vec<String>> = Vec::new(); //stack[row][column]
 
+    let mut index_counter = 0;
     for raw_line in input.lines() {
+        index_counter += 1;
         if raw_line.is_empty() { //check if table is done
             table_finished = true; 
             stack.pop(); //delete empty line, which is due to number list on bottom
@@ -269,7 +271,8 @@ fn day_5() -> String {
             let amount: usize = line[1].parse().unwrap(); //amount of krates to move
             let initial_column: usize = line[3].parse().unwrap(); //initial krate column
             let final_column: usize = line[5].parse().unwrap(); //final krate column
-            println!("initial_column: {}\nfinal_column: {}", initial_column, final_column);
+
+            let mut output = Path::new(".output");
 
             let mut initial_coords: (usize, usize) = (0, 0); //row, col
             let mut initial_value: String = "".to_string(); //3 chars
@@ -310,14 +313,15 @@ fn day_5() -> String {
 
                 //DEBUGGING HERE TO CHECK SOME STUFF 2
                 let _ = clear();
-                for row in stack.clone() {
-                    println!("{:?}", row);
+                println!("{}", index_counter);
+
+                for row in &stack {
+                    let row_str = format!("{:?}", row);
+                    let _ = fs::write(output, row_str);
                 }
-                println!("amount: {}", amount);
-                println!("instruction: {:?}", line);
-                println!("initial value: {:?} at {:?}\nfinal coords: {:?}", initial_value, initial_coords, write_coords, );
-                println!("offset: {}", time);
-                thread::sleep(time::Duration::from_millis(5000));
+                // let debug_str = format!("amount: {}\ninstruction: {:?}\ninitial value: {:?} at {:?}\nfinal coords: {:?}\noffset: {}", amount, line, initial_value, initial_coords, write_coords, time);
+                // let _ = fs::write(output, &debug_str);
+                //thread::sleep(time::Duration::from_millis(5000));
                 //DEBUGGING END
                 
                 //move initial value to final coords
@@ -404,5 +408,5 @@ fn day_5() -> String {
 }
 
 // pairs: ["4-19", "19-67"]
-// cond1: false
 // cond2: true
+// cond1: false
